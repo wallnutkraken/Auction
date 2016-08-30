@@ -1,7 +1,9 @@
-bin/
-obj/
+[Bb]in/
+[Oo]bj/
 *.exe
 *.obj
 .vs/
 *.suo
 *.txt
+*.dll
+packages/
