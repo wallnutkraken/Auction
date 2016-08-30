@@ -85,6 +85,7 @@ type Pimp interface {
 
 func PimpFromJSON(content []byte) (Pimp, error) {
 	p := new(pimp)
+	p.BidItem = NewItem("default")
 	err := json.Unmarshal(content, p)
 	return p, err
 }
