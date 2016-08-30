@@ -11,10 +11,10 @@ func TestSerializingPimp(t *testing.T) {
 	t.Log("Created pimp:", p)
 	bytes, err := p.Serialize()
 	assert.NoError(t, err)
-	t.Log(string(bytes))
+	t.Log("Generated JSON from pimp:", string(bytes))
 
 	readPimp, err := PimpFromJSON(bytes)
 	assert.NoError(t, err)
-	t.Log(readPimp)
+	t.Log("Deserialized pimp:", readPimp)
 	assert.Equal(t, p, readPimp)
 }
