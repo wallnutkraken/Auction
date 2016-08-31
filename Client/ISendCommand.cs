@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-    interface ISendCommand
+    public interface ISendCommand
     {
         string Send();
     }

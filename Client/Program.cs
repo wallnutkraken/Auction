@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Client
@@ -16,18 +17,25 @@ namespace Client
 
         void Run()
         {
-            Client client = new Client("127.0.0.1",1632);
+            Client client = new Client("127.0.0.1", 1632);
             SendCommand availableItemsToBidOn = new SendCommand("list", null);
-            Reply allItems = client.SendToRemote<Reply, SendCommand>(availableItemsToBidOn);
+            SendCommand bidCommand = new SendCommand("bid", new[] { "10", "20" });
 
-            Console.WriteLine(allItems);
 
-            SendCommand bidCommand = new SendCommand("bid",new []{"10","20"});
-            Reply confirmation = client.SendToRemote<Reply, SendCommand>(bidCommand);
+            Thread sendingThread = new Thread(client.SendCommands);
+            Thread receiveThread = new Thread(client.ListenToReplies);
+            sendingThread.Start();
+            receiveThread.Start();
 
-            Console.WriteLine(confirmation);
+            client.CommandsToSend.Add(availableItemsToBidOn);
+            client.CommandsToSend.Add(bidCommand);
 
-            Console.ReadLine();
+            while (true)
+            {
+                Reply reply = client.Replies.Take();
+                Console.WriteLine(reply);
+            }
+
         }
     }
 }
