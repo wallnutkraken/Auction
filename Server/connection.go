@@ -1,9 +1,6 @@
 package main
 
-import (
-	"fmt"
-	"net"
-)
+import "net"
 
 func Pass(sender chan *net.TCPConn) {
 	for {
@@ -21,16 +18,13 @@ func ClientHandler(client Client) {
 	buffer := make([]byte, 4096)
 	for {
 		if n, err := client.GetConnection().Read(buffer); err == nil {
-			logger.Println("Recieved: n =", n, "no err")
-			content := string(buffer[:n])
-			logger.Println("Packet content:", content)
-			buffer = make([]byte, 4096)
+			logger.Println("Recieved: n =", n, "success")
+			content := buffer[:n]
 			if MessageHandler(client, content) {
 				if err := client.GetConnection().Close(); err != nil {
 					logger.Println("Error closing connection with", client.GetConnection().RemoteAddr().String(),
 						"because of", err)
 				}
-				break
 			}
 		} else {
 			logger.Println("Connection with", client.GetConnection().RemoteAddr().String(), "closed because", err)
@@ -39,13 +33,12 @@ func ClientHandler(client Client) {
 	}
 }
 
-func MessageHandler(client Client, content string) bool {
+func MessageHandler(client Client, content []byte) bool {
 	var response string
 	var endConnection bool = false
 
-	if content == "echo" {
-		client.InvertEcho()
-		response = fmt.Sprint("Echo set to ", client.GetEcho())
+	if string(content) == "hello" {
+		response = "Hello to you too!"
 	}
 
 	if response != "" {
