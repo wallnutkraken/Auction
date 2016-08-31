@@ -16,9 +16,18 @@ namespace Client
 
         void Run()
         {
-            Client client = new Client("1.1.1.1",12345);
+            Client client = new Client("127.0.0.1",1632);
+            SendCommand availableItemsToBidOn = new SendCommand("list", null);
+            Reply allItems = client.SendToRemote<Reply, SendCommand>(availableItemsToBidOn);
 
-            string response = client.SendToRemote<string,string>("hello");
+            Console.WriteLine(allItems);
+
+            SendCommand bidCommand = new SendCommand("bid",new []{"10","20"});
+            Reply confirmation = client.SendToRemote<Reply, SendCommand>(bidCommand);
+
+            Console.WriteLine(confirmation);
+
+            Console.ReadLine();
         }
     }
 }

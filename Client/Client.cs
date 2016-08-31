@@ -35,14 +35,21 @@ namespace Client
         public TResult SendToRemote<TResult, TO>(TO objToSend)
         {
             byte[] message = Encode(objToSend);
-            _socket.Connect(new IPEndPoint(IPAddress.Parse(IpRemote), PortNr));
+            if (!_socket.Connected)
+            {
+                _socket.Connect(new IPEndPoint(IPAddress.Parse(IpRemote), PortNr));
+            }
+           
             _socket.Send(message);
             byte[] receiveBuffer = new byte[1024];
             int relevantLenght = _socket.Receive(receiveBuffer);
-            byte[] relevantBuffer = new byte[relevantLenght];
+
+            
+            byte[] relevantBuffer = new byte[1024];
             receiveBuffer.CopyTo(relevantBuffer, 0);
             TResult result = Decode<TResult>(relevantBuffer);
             return result;
+            
         }
     }
 }
