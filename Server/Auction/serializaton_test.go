@@ -16,5 +16,7 @@ func TestSerializingPimp(t *testing.T) {
 	readPimp, err := PimpFromJSON(bytes)
 	assert.NoError(t, err)
 	t.Log("Deserialized pimp:", readPimp)
-	assert.Equal(t, p, readPimp)
+	assert.Equal(t, p.GetCurrentBid(), readPimp.GetCurrentBid(), "CurrentBid")
+	assert.Equal(t, p.GetItem(), readPimp.GetItem(), "Item")
+	assert.Equal(t, p.GetStartingPrice(), readPimp.GetStartingPrice(), "StartingPrice")
 }

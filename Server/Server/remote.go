@@ -1,4 +1,4 @@
-package main
+package Server
 
 import (
 	"errors"
@@ -23,6 +23,17 @@ func (c *client) GetEcho() bool {
 	return c.echo
 }
 
+func (c *client) Send(reply Reply) error {
+	if bytes, err := reply.JSON(); err == nil {
+		if _, err := c.connection.Write(bytes); err != nil {
+			return err
+		}
+		return nil
+	} else {
+		return err
+	}
+}
+
 func NewClient(connection *net.TCPConn) (Client, error) {
 	if connection == nil {
 		return nil, errors.New("Connection cannot be null")
@@ -36,4 +47,5 @@ type Client interface {
 	GetConnection() *net.TCPConn
 	InvertEcho() bool
 	GetEcho() bool
+	Send(Reply) error
 }

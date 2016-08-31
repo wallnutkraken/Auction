@@ -4,14 +4,18 @@ import (
 	"encoding/json"
 	"errors"
 	"time"
+
+	"github.com/wallnutkraken/Auction/Server/Server"
 )
 
 type pimp struct {
-	Price       int
+	Id          int
+	StartPrice  int
 	ExpDate     int64
 	BidItem     Item
 	CurrentBid  int
-	PrevBidders []string
+	prevBidders []Server.Client
+	topBidder   Server.Client
 }
 
 func (p *pimp) Serialize() ([]byte, error) {
@@ -20,16 +24,16 @@ func (p *pimp) Serialize() ([]byte, error) {
 
 func NewPimp(startingPrice int, item Item) Pimp {
 	p := new(pimp)
-	p.Price = startingPrice
+	p.StartPrice = startingPrice
 	p.CurrentBid = startingPrice
 	p.BidItem = item
 	p.ExpDate = time.Now().UTC().Unix() + DurationOfPimp
-	p.PrevBidders = make([]string, 0)
+	p.prevBidders = make([]Server.Client, 0)
 	return p
 }
 
 func (p *pimp) GetStartingPrice() int {
-	return p.Price
+	return p.StartPrice
 }
 
 func (p *pimp) GetTimeLeft() int64 {
@@ -51,12 +55,12 @@ func (p *pimp) SetCurrentBid(bid int) {
 	p.CurrentBid = bid
 }
 
-func (p *pimp) GetPrevBidders() []string {
-	return p.PrevBidders
+func (p *pimp) GetPrevBidders() []Server.Client {
+	return p.prevBidders
 }
 
-func (p *pimp) hasBidder(bidder string) bool {
-	for _, currBidder := range p.PrevBidders {
+func (p *pimp) hasBidder(bidder Server.Client) bool {
+	for _, currBidder := range p.prevBidders {
 		if currBidder == bidder {
 			return true
 		}
@@ -64,12 +68,24 @@ func (p *pimp) hasBidder(bidder string) bool {
 	return false
 }
 
-func (p *pimp) AddBidder(bidder string) error {
+func (p *pimp) AddBidder(bidder Server.Client) error {
 	if p.hasBidder(bidder) {
 		return errors.New("Bidder already exists")
 	}
-	p.PrevBidders = append(p.PrevBidders, bidder)
+	p.prevBidders = append(p.prevBidders, bidder)
 	return nil
+}
+
+func (p *pimp) GetTopBidder() Server.Client {
+	return p.topBidder
+}
+
+func (p *pimp) SetTopBidder(newBidder Server.Client) {
+	p.topBidder = newBidder
+}
+
+func (p *pimp) GetId() int {
+	return p.Id
 }
 
 type Pimp interface {
@@ -78,8 +94,11 @@ type Pimp interface {
 	GetItem() Item
 	GetCurrentBid() int
 	SetCurrentBid(int)
-	GetPrevBidders() []string
-	AddBidder(string) error
+	GetPrevBidders() []Server.Client
+	AddBidder(Server.Client) error
+	GetTopBidder() Server.Client
+	SetTopBidder(Server.Client)
+	GetId() int
 	Serialize() ([]byte, error)
 }
 

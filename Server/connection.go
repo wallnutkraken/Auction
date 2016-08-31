@@ -1,11 +1,15 @@
 package main
 
-import "net"
+import (
+	"net"
+
+	S "github.com/wallnutkraken/Auction/Server/Server"
+)
 
 func Pass(sender chan *net.TCPConn) {
 	for {
 		connection := <-sender
-		client, err := NewClient(connection)
+		client, err := S.NewClient(connection)
 		if err == nil {
 			go ClientHandler(client)
 		} else {
@@ -14,7 +18,7 @@ func Pass(sender chan *net.TCPConn) {
 	}
 }
 
-func ClientHandler(client Client) {
+func ClientHandler(client S.Client) {
 	buffer := make([]byte, 4096)
 	for {
 		if n, err := client.GetConnection().Read(buffer); err == nil {
@@ -33,12 +37,15 @@ func ClientHandler(client Client) {
 	}
 }
 
-func MessageHandler(client Client, content []byte) bool {
+func MessageHandler(client S.Client, content []byte) bool {
 	var response string
 	var endConnection bool = false
 
-	if string(content) == "hello" {
-		response = "Hello to you too!"
+	_, err := S.CmdFromJSON(content)
+	if err != nil {
+		logger.Println("Discarded bad command packet:", string(content), "because of", err)
+	} else {
+
 	}
 
 	if response != "" {
