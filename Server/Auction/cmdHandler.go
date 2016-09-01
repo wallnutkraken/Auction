@@ -14,5 +14,15 @@ func bid(command Server.Cmd, client Server.Client, auct Auction) error {
 	if bidValue, err = command.ArgInt(1); err != nil {
 		return client.Send(Server.ErrorResponse(err.Error()))
 	}
-	err = auct.Bid(client, pimpId, bidValue)
+	return auct.Bid(client, pimpId, bidValue)
+}
+
+func list(command Server.Cmd, client Server.Client, auct Auction) error {
+	/* Command currently unused */
+	pimps, err := auct.ActivePimpsJSON()
+	if err != nil {
+		return err
+	}
+	response := Server.Reply{ReplyType: command.Command, ValueJson: string(pimps)}
+	return client.Send(response)
 }

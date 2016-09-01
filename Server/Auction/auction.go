@@ -1,6 +1,7 @@
 package Auction
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/wallnutkraken/Auction/Server/Server"
@@ -72,20 +73,55 @@ func (a *auction) NewPimp(newPimp Pimp) error {
 	return a.ErrorPimpExists()
 }
 
+func (a *auction) ActivePimpsJSON() ([]byte, error) {
+	activePimps := make([]Pimp, 0)
+	for _, cPimp := range a.Pimps {
+		if cPimp.GetTimeLeft() != 0 {
+			activePimps = append(activePimps, cPimp)
+		}
+	}
+	return json.Marshal(activePimps)
+}
+
 func (a *auction) RemoveUser(cl Server.Client) {
-	for x := 0; x < len(a.Users); x++ {
+	var size int = len(a.Users)
+	if size < 2 {
+		/* Only user */
+		a.Users = make([]Server.Client, 0)
+		return
+	}
+	for x := 0; x < size; x++ {
 		if a.Users[x].GetConnection() == cl.GetConnection() {
-			//a.Users = append(a.Users[0:x], a.Users[x:])
-			panic("aaa")
+			if x == len(a.Users)-1 { /* Last index */
+				a.Users = a.Users[:size-2]
+			} else if x == 0 { /* First index */
+				a.Users = a.Users[1:]
+			} else { /* In the middle */
+				a.Users = append(a.Users[:x], a.Users[x+1:]...)
+			}
 		}
 	}
 }
 
-func (a *auction) ExecCommand(command Server.Cmd, client Server.Client) {
+func (a *auction) ExecCommand(command Server.Cmd, client Server.Client) error {
+	var err error
 	switch command.Command {
 	case "bid":
-		bid(command, client, a)
+		err = bid(command, client, a)
+	case "list":
+		err = list(command, client, a)
+	default:
+		err = client.Send(Server.ErrorResponse("Command not supported"))
 	}
+
+	return err
+}
+
+func NewAuction() Auction {
+	auct := new(auction)
+	auct.Pimps = make(map[int]Pimp)
+	auct.Users = make([]Server.Client, 0)
+	return auct
 }
 
 type Auction interface {
@@ -95,5 +131,6 @@ type Auction interface {
 	AddUser(Server.Client)
 	RemoveUser(Server.Client)
 	Bid(Server.Client, int, int) error
-	ExecCommand(Server.Cmd, Server.Client)
+	ExecCommand(Server.Cmd, Server.Client) error
+	ActivePimpsJSON() ([]byte, error)
 }

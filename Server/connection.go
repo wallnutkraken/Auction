@@ -41,11 +41,14 @@ func MessageHandler(client S.Client, content []byte) bool {
 	var response string
 	var endConnection bool = false
 
-	_, err := S.CmdFromJSON(content)
+	command, err := S.CmdFromJSON(content)
 	if err != nil {
 		logger.Println("Discarded bad command packet:", string(content), "because of", err)
 	} else {
-
+		err = auction.ExecCommand(command, client)
+		if err != nil {
+			logger.Println("Could not send response to", command.Command, "command because of", err)
+		}
 	}
 
 	if response != "" {

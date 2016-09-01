@@ -6,12 +6,13 @@ import (
 	"log"
 	"net"
 	"os"
-	"sync"
+
+	"github.com/wallnutkraken/Auction/Server/Auction"
 )
 
 var (
-	logger *log.Logger
-	wait   *sync.WaitGroup
+	logger  *log.Logger
+	auction Auction.Auction
 )
 
 func main() {
@@ -37,12 +38,11 @@ func main() {
 		logger.Fatalln(err)
 	}
 
+	auction = Auction.NewAuction()
+
 	listenChan := make(chan *net.TCPConn, 64)
 	go Acceptance(server, listenChan)
-	go Pass(listenChan)
-	wait = &sync.WaitGroup{}
-	wait.Add(1)
-	wait.Wait()
+	Pass(listenChan)
 }
 
 func Acceptance(server Server.Server, callback chan *net.TCPConn) {
@@ -54,5 +54,4 @@ func Acceptance(server Server.Server, callback chan *net.TCPConn) {
 			logger.Println("Refused connection:", err.Error(), "conn =", conn)
 		}
 	}
-	wait.Done()
 }
