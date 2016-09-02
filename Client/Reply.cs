@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Client
 {
@@ -13,7 +14,8 @@ namespace Client
 
         public override string ToString()
         {
-            return ReplyType + ValueJson;
+            return $"{ReplyType},{ValueJson}";
         }
+
     }
 }

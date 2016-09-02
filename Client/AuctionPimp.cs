@@ -13,5 +13,9 @@ namespace Client
         public int ExpDate { get; set; }
         public Item BidItem { get; set; }
         public int CurrentBid { get; set; }
+        public override string ToString()
+        {
+            return $"{Id},{StartPrice},{ExpDate},{BidItem},{CurrentBid}";
+        }
     }
 }
