@@ -39,6 +39,7 @@ func main() {
 	}
 
 	auction = Auction.NewAuction()
+	auction.NewPimp(Auction.NewPimp(100, Auction.NewItem("Artifact")))
 
 	listenChan := make(chan *net.TCPConn, 64)
 	go Acceptance(server, listenChan)
