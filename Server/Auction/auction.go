@@ -3,6 +3,8 @@ package Auction
 import (
 	"encoding/json"
 	"errors"
+	"math/rand"
+	"time"
 
 	"github.com/wallnutkraken/Auction/Server/Server"
 )
@@ -74,13 +76,28 @@ func (a *auction) NewPimp(newPimp Pimp) error {
 }
 
 func (a *auction) ActivePimpsJSON() ([]byte, error) {
-	activePimps := make([]Pimp, 0)
-	for _, cPimp := range a.Pimps {
-		if cPimp.GetTimeLeft() != 0 {
-			activePimps = append(activePimps, cPimp)
+	pimps := make([]Pimp, 0)
+	for _, p := range a.Pimps {
+		if p != nil {
+			pimps = append(pimps, p)
 		}
 	}
-	return json.Marshal(activePimps)
+	return json.Marshal(pimps)
+}
+
+func (a *auction) removeEndedPimps() {
+	for id, cPimp := range a.Pimps {
+		if cPimp != nil && cPimp.GetTimeLeft() == 0 {
+			a.Pimps[id] = nil
+		}
+	}
+}
+
+func (a *auction) periodicClear() {
+	for {
+		a.removeEndedPimps()
+		time.Sleep(time.Second * 16)
+	}
 }
 
 func (a *auction) RemoveUser(cl Server.Client) {
@@ -121,6 +138,7 @@ func NewAuction() Auction {
 	auct := new(auction)
 	auct.Pimps = make(map[int]Pimp)
 	auct.Users = make([]Server.Client, 0)
+	go auct.periodicClear()
 	return auct
 }
 
@@ -133,4 +151,8 @@ type Auction interface {
 	Bid(Server.Client, int, int) error
 	ExecCommand(Server.Cmd, Server.Client) error
 	ActivePimpsJSON() ([]byte, error)
+}
+
+func init() {
+	rand.Seed(time.Now().UTC().UnixNano())
 }
