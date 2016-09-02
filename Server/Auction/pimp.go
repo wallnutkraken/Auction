@@ -3,6 +3,7 @@ package Auction
 import (
 	"encoding/json"
 	"errors"
+	"math/rand"
 	"time"
 
 	"github.com/wallnutkraken/Auction/Server/Server"
@@ -29,6 +30,7 @@ func NewPimp(startingPrice int, item Item) Pimp {
 	p.BidItem = item
 	p.ExpDate = time.Now().UTC().Unix() + DurationOfPimp
 	p.prevBidders = make([]Server.Client, 0)
+	p.Id = rand.Int()
 	return p
 }
 
