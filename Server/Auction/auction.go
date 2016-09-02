@@ -76,7 +76,13 @@ func (a *auction) NewPimp(newPimp Pimp) error {
 }
 
 func (a *auction) ActivePimpsJSON() ([]byte, error) {
-	return json.Marshal(a.Pimps)
+	pimps := make([]Pimp, 0)
+	for _, p := range a.Pimps {
+		if p != nil {
+			pimps = append(pimps, p)
+		}
+	}
+	return json.Marshal(pimps)
 }
 
 func (a *auction) removeEndedPimps() {
