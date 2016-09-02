@@ -12,7 +12,7 @@ import (
 var words chan string = make(chan string, 16)
 
 func GeneratePimp() Auction.Pimp {
-	return Auction.NewPimp(rand.Int(), Auction.NewItem(getWord()))
+	return Auction.NewPimp(int(rand.Int31()), Auction.NewItem(getWord()))
 }
 
 func getWord() string {

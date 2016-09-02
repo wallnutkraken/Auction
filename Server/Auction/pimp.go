@@ -30,7 +30,7 @@ func NewPimp(startingPrice int, item Item) Pimp {
 	p.BidItem = item
 	p.ExpDate = time.Now().UTC().Unix() + DurationOfPimp
 	p.prevBidders = make([]Server.Client, 0)
-	p.Id = rand.Int()
+	p.Id = int(rand.Int31())
 	return p
 }
 
