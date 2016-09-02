@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Auction.cs" />
     <Compile Include="AuctionPimp.cs" />
     <Compile Include="Reply.cs" />
     <Compile Include="SendCommand.cs" />

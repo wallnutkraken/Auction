@@ -12,50 +12,43 @@ namespace Client
     {
         static void Main(string[] args)
         {
-            Program p = new Program();
-            p.Run();
+            try
+            {
+                Program p = new Program();
+                p.Run();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            
         }
 
-        private TResult Decode<TResult>(string receivedJson)
-        {
-            TResult result = JsonConvert.DeserializeObject<TResult>(receivedJson);
-            return result;
-        }
 
         void Run()
         {
-            Client client = new Client("127.0.0.1", 1632);
-            SendCommand availableItemsToBidOn = new SendCommand("list", null);
-            SendCommand bidCommand = new SendCommand("bid", new[] { "0", "120" });
-            client.Run();
-
-            client.CommandsToSend.Add(availableItemsToBidOn);
-            client.CommandsToSend.Add(bidCommand);
-
-            List<AuctionPimp> auctionPimps = new List<AuctionPimp>();
+            Auction auction = new Auction();
 
             while(true)
             {
-                Reply reply = client.Replies.Take();
-                Console.WriteLine(reply);
-
-                string replyType = reply.ReplyType;
-                switch(replyType)
+                auction.DecideOnReplies();
+                auction.DisplayMenu();
+                int choice = int.Parse(Console.ReadLine());
+                switch(choice)
                 {
-                    case "list":
-                        List<AuctionPimp> aps = Decode<List<AuctionPimp>>(reply.ValueJson);
-                        auctionPimps.AddRange(aps);
+                    case 0:
+                        auction.RequestUpdate();
                         break;
-                    case "somethingElse":
+                    case 1:
+                        auction.DisplayItemsToBidOn();
+                        int[] choices = auction.AskWhichItemToBidOn();
+                        auction.Bid(choices[0], choices[1]);
                         break;
-                    default:
-                        break;
-                }
-                foreach (AuctionPimp auctionPimp in auctionPimps)
-                {
-                    Console.WriteLine(auctionPimp);
                 }
             }
+
+
         }
     }
 }
+
