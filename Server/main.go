@@ -43,6 +43,9 @@ func main() {
 
 	listenChan := make(chan *net.TCPConn, 64)
 	go Acceptance(server, listenChan)
+
+	go AddRandomPimps()
+
 	Pass(listenChan)
 }
 
