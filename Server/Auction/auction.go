@@ -87,7 +87,7 @@ func (a *auction) ActivePimpsJSON() ([]byte, error) {
 
 func (a *auction) removeEndedPimps() {
 	for id, cPimp := range a.Pimps {
-		if cPimp.GetTimeLeft() == 0 {
+		if cPimp != nil && cPimp.GetTimeLeft() == 0 {
 			a.Pimps[id] = nil
 		}
 	}
