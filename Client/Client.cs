@@ -84,6 +84,7 @@ namespace Client
         {
             while(_connected)
             {
+
                 byte[] receiveBuffer = new byte[0xffff];
                 int relevantLenght = _socket.Receive(receiveBuffer);
                 byte[] relevantBuffer = new byte[relevantLenght];

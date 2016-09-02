@@ -12,17 +12,12 @@ namespace Client
     {
         static void Main(string[] args)
         {
-            try
-            {
-                Program p = new Program();
-                p.Run();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-            
+
+            Program p = new Program();
+            p.Run();
         }
+
+
 
 
         void Run()
